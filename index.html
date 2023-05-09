@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="cs">
+<head>
+    <title>PepperDict</title>
+    <link rel="stylesheet" href="style.css">
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8"/>
+
+    <script type="application/javascript" charset="UTF-8">
+
+        function initAppClick() {
+            initApp();
+            // window.location.href = 'file:///C:/Users/kamis/PycharmProjects/pepperdict_firebase/behavior_1/html/index.html';
+            window.location.href = 'https://pepper-dict.web.app/index.html';
+        }
+
+        function initApp() {
+            document.getElementById('search-input-bar').value = "";
+            document.getElementById('other-words-button').textContent = "Vyhledat slova začínající na ...";
+            document.getElementById( 'other-words' ).style.display = 'none';
+            document.getElementById('word-info').src = "";
+            document.getElementById( 'word-info' ).style.display = 'block';
+        }
+
+        function searchWordClick() {
+            var input = document.getElementById('search-input-bar').value;
+            input=input.toLowerCase();
+            // window.location.href = 'file:///C:/Users/kamis/PycharmProjects/pepperdict_firebase/behavior_1/html/index.html?slovo ' + input;
+            window.location.href = 'https://pepper-dict.web.app/index.html?slovo ' + input;
+
+            searchWord(input);
+        }
+
+        function searchWord(input) {
+            // document.getElementById('icon-button').setAttribute("href",
+            //     "index.html?slovo " + input);
+            document.getElementById( 'other-words' ).style.display = 'none';
+            document.getElementById( 'word-info' ).style.display = 'block';
+            document.getElementById('word-info').src =
+                'https://deb.fi.muni.cz/api/debdict.php?dict=ssc&action=getdoc&tr=ssc2&id=' + input;
+            document.getElementById('search-input-bar').value = input;
+            var button = document.getElementById("other-words-button");
+            button.textContent = "Vyhledat slova začínající na " + input;
+            // button.setAttribute("href", "index.html?hledani " + input);
+        }
+
+        function searchOtherWordsClick() {
+            var input = document.getElementById('search-input-bar').value;
+            input=input.toLowerCase();
+            // window.location.href = 'file:///C:/Users/kamis/PycharmProjects/pepperdict_firebase/behavior_1/html/index.html?hledani ' + input;
+            window.location.href = 'https://pepper-dict.web.app/index.html?hledani ' + input;
+
+            searchOtherWords(input);
+        }
+
+        function searchOtherWords(input) {
+            // window.location.href = 'file:///C:/Users/kamis/PycharmProjects/pepperdict_firebase/behavior_1/html/index.html?hledani ' + input;
+            document.getElementById( 'word-info' ).style.display = 'none';
+            document.getElementById( 'other-words' ).style.display = 'block';
+            document.getElementById('search-input-bar').value = input;
+            // document.getElementById("other-words-button").setAttribute("href",
+            //     "index.html?hledani " + input);
+            createButtons(input);
+        }
+
+        // function createButtons(input) {
+        //     try {
+        //         fetch("http://localhost:3000", {
+        //             headers: {
+        //                 "Target-URL": 'https://deb.fi.muni.cz/api/debdict.php?dict=ssc&action=list_starts_with&id='
+        //                     + encodeURIComponent(input)
+        //             }
+        //         }).then(response => response.text())
+        //             .then(text => {
+        //                 var words = text.split("\n");
+        //
+        //                 var doc = document.getElementById('other-words');
+        //                 var ifrDoc = doc.contentDocument;
+        //                 ifrDoc.body.replaceChildren();
+        //
+        //                 for (var i = 0; i < words.length; i++) {
+        //
+        //                     if (/[^a-z\u00C0-\u017F-() ]/i.test(words[i])) {
+        //                         continue;
+        //                     }
+        //                     var button = ifrDoc.createElement("button");
+        //                     button.style.cssText = 'display: inline-block;border: None;background-color: #d0d5f9;' +
+        //                         'justify-content: center; align-items: center;cursor: pointer;' +
+        //                         'font-family: Arial, serif;font-size: 30px;font-weight: bold;color: #35428e;' +
+        //                         'padding: 0.7rem;margin:10px;border-radius: 7px;';
+        //                     button.style.textDecoration = "none";
+        //                     button.textContent = words[i];
+        //                     // button.setAttribute("href", "index.html?slovo " + words[i]);
+        //                     // button.setAttribute("target", "_top");
+        //
+        //                     (function(e) {
+        //                         button.onclick = function() {
+        //                             document.getElementById("search-input-bar").value = words[e];
+        //                             searchWordClick();
+        //                         }
+        //                     })(i);
+        //
+        //                     ifrDoc.body.appendChild(button);
+        //                 }
+        //             });
+        //     } catch (error) {
+        //         console.error(error);
+        //     }
+        // }
+
+        function createButtons(input) {
+            try {
+                var xhr = new XMLHttpRequest();
+                xhr.open("GET", "https://pepper-dict.web.app/index.html?hledani%20" + input, true);
+                xhr.setRequestHeader("Target-URL", 'https://deb.fi.muni.cz/api/debdict.php?dict=ssc&action=list_starts_with&id=' + encodeURIComponent(input));
+                // xhr.open("GET", 'https://deb.fi.muni.cz/api/debdict.php?dict=ssc&action=list_starts_with&id=' + encodeURIComponent(input), true);
+                // xhr.setRequestHeader("Target-URL", "http://localhost:3000");
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        var text = xhr.responseText;
+                        var words = text.split("\n");
+
+                        var doc = document.getElementById('other-words');
+                        var ifrDoc = doc.contentDocument;
+                        ifrDoc.body.innerHTML = "";
+
+                        for (var i = 0; i < words.length; i++) {
+                            if (/[^a-z\u00C0-\u017F-() ]/i.test(words[i])) {
+                                continue;
+                            }
+                            var button = ifrDoc.createElement("button");
+                            button.style.cssText = 'display: inline-block;border: None;background-color: #d0d5f9;' +
+                                'justify-content: center; align-items: center;cursor: pointer;' +
+                                'font-family: Arial, serif;font-size: 30px;font-weight: bold;color: #35428e;' +
+                                'padding: 0.7rem;margin:10px;border-radius: 7px;';
+                            button.style.textDecoration = "none";
+                            button.textContent = words[i];
+
+                            (function(e) {
+                                button.onclick = function() {
+                                    document.getElementById("search-input-bar").value = words[e];
+                                    searchWordClick();
+                                }
+                            })(i);
+
+                            ifrDoc.body.appendChild(button);
+                        }
+                    }
+                };
+                xhr.send();
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+    </script>
+</head>
+
+<body>
+<div class="container">
+    <div class="search-bar">
+        <div class="dict-name" onclick="initAppClick()"> Slovník spisovné češtiny </div>
+        <div class="input-bar">
+            <label>
+                <input id="search-input-bar" type="search" class="form-control"
+                       onKeyDown="if(event.keyCode==13) searchWordClick();"
+                       placeholder="Zadejte slovo, které chcete vyhledat">
+            </label>
+            <span class="search-icon">
+                        <button id="icon-button" onclick="searchWordClick()">
+                            <img src="search-icon.svg" alt="search"/>
+                        </button>
+                <!--                        <a href="index.html" id="icon-button" onclick="">-->
+                <!--                            <img src="search-icon.svg" alt="search"/>-->
+                <!--                        </a>-->
+                    </span>
+        </div>
+    </div>
+    <div class="show">
+        <iframe id="word-info" src=""></iframe>
+        <iframe id="other-words" src="" style="display: none"></iframe>
+    </div>
+    <button id="other-words-button" onclick="searchOtherWordsClick()">
+        Vyhledat slova začínající na ...
+    </button>
+    <!--            <a href="index.html" id="other-words-button" onclick="">-->
+    <!--                Vyhledat slova začínající na ...-->
+    <!--            </a>-->
+</div>
+</body>
+
+
+<script type="text/javascript">
+    var argument = document.location.search;
+    if (argument.startsWith("?slovo")) {
+        searchWord(decodeURIComponent(argument.split("%20")[1]));
+    }
+    else if (argument.startsWith("?hledani")) {
+        searchOtherWords(decodeURIComponent(argument.split("%20")[1]));
+    }
+    else {
+        initApp();
+    }
+</script>
+</html>
